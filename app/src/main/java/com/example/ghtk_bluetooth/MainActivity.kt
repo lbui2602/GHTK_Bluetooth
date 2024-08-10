@@ -67,7 +67,9 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        bluetoothDeviceAdapter = BluetoothDeviceAdapter(listOf())
+        bluetoothDeviceAdapter = BluetoothDeviceAdapter(bluetoothDevices) { device ->
+            connectToDevice(device)
+        }
         binding.recyclerViewDevices.layoutManager = LinearLayoutManager(this)
         binding.recyclerViewDevices.adapter = bluetoothDeviceAdapter
 
@@ -87,8 +89,6 @@ class MainActivity : AppCompatActivity() {
 
         val filter = IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED)
         registerReceiver(bluetoothStateReceiver, filter)
-
-
     }
 
     private fun updateBluetoothStatus(state: Int) {
@@ -142,7 +142,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-
     @SuppressLint("MissingPermission")
     private fun startDiscovery() {
         if (bluetoothAdapter!!.isDiscovering) {
@@ -172,6 +171,20 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    @SuppressLint("MissingPermission")
+    private fun connectToDevice(device: BluetoothDevice) {
+        // Stop discovery to prevent interference
+        bluetoothAdapter?.cancelDiscovery()
+
+        // Implement your Bluetooth connection logic here
+        // For example, you can use device.createBond() to pair with the device
+        // or you can connect to a specific Bluetooth service if available
+        if (device.createBond()) {
+            Toast.makeText(this, "Đã kết nối với thiết bị ${device.name}", Toast.LENGTH_SHORT).show()
+        } else {
+            Toast.makeText(this, "Không thể kết nối với thiết bị ${device.name}", Toast.LENGTH_SHORT).show()
+        }
+    }
 
     override fun onDestroy() {
         super.onDestroy()
